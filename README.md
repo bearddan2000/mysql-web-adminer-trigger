@@ -1,4 +1,4 @@
-# mysql-web-adminer
+# mysql-web-adminer-trigger
 
 ## Description
 Creates a small database table

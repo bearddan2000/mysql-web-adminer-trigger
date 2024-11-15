@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   adminer:
     image: adminer
@@ -6,16 +6,18 @@ services:
     ports:
       - 80:8080
     depends_on:
-      - db
-    links:
-      - "db:db"
+      db:
+        condition: service_healthy
+        restart: true
 
   db:
     image: mariadb:latest
+    ports:
+      - 3306
+    healthcheck:
+      test: "pwd"
     volumes:
-      - ./db/data_dump:/var/lib/mysql
-      - ./db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
-      - ./db/dump-db.sql:/usr/local/dump-db.sql
+      - ./db/sql:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
       - MYSQL_USER=maria

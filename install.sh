@@ -86,92 +86,6 @@ function usage() {
     echo "-h: Display this help and exit."
     echo ""
 }
-function decompress() {
-    scope="decompress"
-    info_base="[$timestamp INFO]: $basefile::$scope"
-
-    echo "$info_base started" >> $logfile
-
-    dir=$1
-
-    filename=$2
-
-    decompressed_folder=$3
-
-    if [[ -d "$dir/$decompressed_folder" ]]; then
-
-          echo "$info_base $filename already decompressed" >> $logfile
-
-          echo "$info_base ended" >> $logfile
-
-          echo "================" >> $logfile
-
-          return
-    fi
-
-    echo "$info_base changing directory to $dir" >> $logfile
-
-    cd ${dir}
-
-    echo "$info_base decompress $dir/$filename " >> ../$logfile
-
-    sudo tar -xf $filename
-
-    echo "$info_base removing $filename " >> ../$logfile
-
-    sudo rm -f $filename
-
-    echo "$info_base changing directory back" >> ../$logfile
-
-    cd ../
-
-    echo "$info_base ended" >> $logfile
-
-    echo "================" >> $logfile
-}
-function compress() {
-    scope="compress"
-    info_base="[$timestamp INFO]: $basefile::$scope"
-
-    echo "$info_base started" >> $logfile
-
-    dir=$1
-
-    filename=$2
-
-    decompressed_folder=$3
-
-    if [[ -f "$dir/$filename" ]]; then
-
-          echo "$info_base $decompressed_folder already compressed" >> $logfile
-
-          echo "$info_base ended" >> $logfile
-
-          echo "================" >> $logfile
-
-          return
-    fi
-
-    echo "$info_base changing directory to $dir" >> $logfile
-
-    cd ${dir}
-
-    echo "$info_base compressing $dir/$decompressed_folder " >> ../$logfile
-
-    sudo tar -czvf $filename $decompressed_folder
-
-    echo "$info_base removing $decompressed_folder " >> ../$logfile
-
-    sudo rm -Rf $decompressed_folder
-
-    echo "$info_base changing directory back" >> ../$logfile
-
-    cd ../
-
-    echo "$info_base ended" >> $logfile
-
-    echo "================" >> $logfile
-}
 function start-up(){
 
     local scope="start-up"
@@ -180,14 +94,9 @@ function start-up(){
 
     echo "$info_base started" >> $logfile
 
-    decompress "db" "data_dump.tar.gz" "data_dump"
-
     echo "$info_base starting services" >> $logfile
 
-    sudo docker-compose up -d --build \
-      && sleep 3 \
-      && sudo docker exec -d ${docker_img_name}_db_1 sh -c 'exec chmod +x /usr/local/dump-db.sql' \
-      && sudo docker exec -d ${docker_img_name}_db_1 sh -c 'exec mysql -uroot < /usr/local/dump-db.sql'
+    sudo docker-compose up
 
     echo "$info_base ended" >> $logfile
 
@@ -200,11 +109,9 @@ function tear-down(){
 
     echo "$info_base started" >> $logfile
 
-    compress "db" "data_dump.tar.gz" "data_dump"
-
     echo "$info_base starting services" >> $logfile
 
-    sudo docker-compose down
+    sudo docker compose down
 
     echo "$info_base ended" >> $logfile
 

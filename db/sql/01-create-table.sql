@@ -1,7 +1,3 @@
-DROP DATABASE IF EXISTS `animal`;
-
-CREATE DATABASE `animal`;
-
 DROP TABLE IF EXISTS `animal`.dog;
 
 CREATE TABLE `animal`.dog (
